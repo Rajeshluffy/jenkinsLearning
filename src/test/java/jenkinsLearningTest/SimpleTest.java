@@ -13,5 +13,6 @@ public class SimpleTest {
 		String title = driver.getTitle();
 
 		Assert.assertEquals(title, "Google");
+		driver.quit();
 	}
 }
