@@ -5,10 +5,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SimpleTest {
+	ChromeDriver driver;
 	@Test
 	public void login() {
 		//Chrome Driver improvements
-		ChromeDriver driver = new ChromeDriver();
+		driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.get("https://www.google.co.in/");
 		String pageTitle = driver.getTitle();
