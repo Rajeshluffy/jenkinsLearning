@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 public class SimpleTest {
 	@Test
 	public void login() {
-		//Chrome Driver improvements
+		//Chrome Driver improvements 1
 		ChromeDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.get("https://www.google.co.in/");
