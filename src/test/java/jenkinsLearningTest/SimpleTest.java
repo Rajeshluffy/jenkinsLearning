@@ -9,6 +9,7 @@ public class SimpleTest {
 	@Test
 	public void login() {
 		//Chrome Driver improvements
+		// Poll scm trigger
 		driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.get("https://www.google.co.in/");
