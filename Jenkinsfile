@@ -19,8 +19,9 @@ pipeline {
         }
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'docker exec minikube kubectl delete job sdet-test-job --ignore-not-found=true'
-                sh 'docker exec minikube kubectl apply -f /app/k8s/test-job.yaml'
+                sh 'docker exec minikube /usr/local/bin/kubectl delete job sdet-test-job --ignore-not-found=true'
+                sh 'docker cp k8s/test-job.yaml minikube:/tmp/test-job.yaml'
+                sh 'docker exec minikube /usr/local/bin/kubectl apply -f /tmp/test-job.yaml'
             }
         }
     }
