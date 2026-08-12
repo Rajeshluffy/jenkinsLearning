@@ -1,0 +1,16 @@
+mkdir -p k8s
+cat > k8s/test-job.yaml << 'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sdet-test-job
+spec:
+  template:
+    spec:
+      containers:
+        - name: sdet-tests
+          image: sdet-test:latest
+          imagePullPolicy: Never
+      restartPolicy: Never
+  backoffLimit: 0
+EOF
