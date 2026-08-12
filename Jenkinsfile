@@ -1,11 +1,10 @@
-cat > Jenkinsfile << 'EOF'
+cat > Jenkinsfile << 'ENDOFFILE'
 pipeline {
     agent any
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-creds',
-                    url: 'https://github.com/Rajeshluffy/jenkinsLearning.git',
+                git url: 'https://github.com/Rajeshluffy/jenkinsLearning.git',
                     branch: 'master'
             }
         }
@@ -31,4 +30,4 @@ pipeline {
         failure { echo 'Pipeline failed — check Console Output' }
     }
 }
-EOF
+ENDOFFILE
