@@ -1,4 +1,3 @@
-cat > Jenkinsfile << 'ENDOFFILE'
 pipeline {
     agent any
     stages {
@@ -30,4 +29,3 @@ pipeline {
         failure { echo 'Pipeline failed — check Console Output' }
     }
 }
-ENDOFFILE
