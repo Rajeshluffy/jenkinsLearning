@@ -17,11 +17,11 @@ pipeline {
                 sh 'docker save sdet-test:latest | docker exec -i minikube ctr images import -'
             }
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'docker exec minikube /usr/local/bin/kubectl delete job sdet-test-job --ignore-not-found=true'
+       stage('Deploy to Kubernetes') {
+    	    steps {
+                sh 'docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl delete job sdet-test-job --ignore-not-found=true'
                 sh 'docker cp k8s/test-job.yaml minikube:/tmp/test-job.yaml'
-                sh 'docker exec minikube /usr/local/bin/kubectl apply -f /tmp/test-job.yaml'
+                sh 'docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl apply -f /tmp/test-job.yaml'
             }
         }
     }
