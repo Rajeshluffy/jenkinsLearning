@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t sdet-test:latest .'
+               sh 'docker build --platform linux/amd64 -t sdet-test:latest .'
             }
         }
         stage('Load Image into Minikube') {
