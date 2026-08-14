@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Load Image into Minikube') {
             steps {
-                sh 'docker save sdet-test:latest | docker exec -i minikube ctr -n k8s.io images import -'
+                sh 'docker save sdet-test:latest | docker exec -i minikube ctr images import -'
             }
         }
        stage('Deploy to Kubernetes') {
@@ -27,5 +27,7 @@ pipeline {
     post {
         success { echo 'Pipeline complete' }
         failure { echo 'Pipeline failed — check Console Output' }
+	always  {
+        junit '**/target/surefire-reports/*.xml'  }
     }
 }
