@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Load Image into Minikube') {
             steps {
-                sh 'docker save sdet-test:latest | docker exec -i minikube ctr images import -'
+                sh 'docker save sdet-test:latest | docker exec -i minikube ctr -n k8s.io images import -'
             }
         }
        stage('Deploy to Kubernetes') {
