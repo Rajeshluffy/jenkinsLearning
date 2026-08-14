@@ -1,4 +1,7 @@
-FROM jenkins/jenkins:lts-jdk17
-USER root
-RUN apt-get update && apt-get install -y docker.io
-USER jenkins
+FROM maven:3.9-eclipse-temurin-17
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+COPY src ./src
+COPY testng.xml .
+CMD ["mvn", "clean", "test", "-B"]
