@@ -14,20 +14,33 @@ pipeline {
         }
         stage('Load Image into Minikube') {
             steps {
-                sh 'docker save sdet-test:latest | docker exec -i minikube ctr images import -'
+                sh 'docker save sdet-test:latest | docker exec -i minikube ctr --namespace=k8s.io images import -'
             }
         }
-       stage('Deploy to Kubernetes') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh 'docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf delete job sdet-test-job --ignore-not-found=true'
                 sh 'cat k8s/test-job.yaml | docker exec -i minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f -'
             }
         }
+        stage('Collect Test Results') {
+            steps {
+                sh '''
+                    KUBECTL="docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf"
+                    $KUBECTL wait --for=condition=complete job/sdet-test-job --timeout=300s || true
+                    POD=$($KUBECTL get pods -l job-name=sdet-test-job -o jsonpath='{.items[0].metadata.name}')
+                    $KUBECTL cp $POD:/app/target/surefire-reports /tmp/surefire-reports
+                    mkdir -p target
+                    docker cp minikube:/tmp/surefire-reports ./target/surefire-reports
+                '''
+            }
+        }
     }
     post {
+        always {
+            junit allowEmptyResults: true, testResults: '**/surefire-reports/*.xml'
+        }
         success { echo 'Pipeline complete' }
         failure { echo 'Pipeline failed — check Console Output' }
-	always  {
-        junit '**/target/surefire-reports/*.xml'  }
     }
 }
