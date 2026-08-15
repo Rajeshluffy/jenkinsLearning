@@ -8,6 +8,13 @@ spec:
       containers:
       - name: sdet-test
         image: sdet-test:latest
-        imagePullPolicy: Never
+        imagePullPolicy: Never       # 1. Forces K8s to use your loaded local image
+        volumeMounts:
+        - name: test-reports
+          mountPath: /app/target/surefire-reports
       restartPolicy: Never
-  backoffLimit: 0
+      volumes:
+      - name: test-reports
+        hostPath:
+          path: /tmp/surefire-reports # 2. Writes files directly to the Minikube node
+          type: DirectoryOrCreate
