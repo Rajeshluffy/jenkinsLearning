@@ -13,10 +13,11 @@ pipeline {
             }
         }
         stage('Load Image into Minikube') {
-            steps {
-                sh 'docker save sdet-test:latest | docker exec -i minikube ctr --namespace=k8s.io images import -'
-            }
-        }
+    steps {
+        sh 'docker save sdet-test:latest | docker exec -i minikube ctr --namespace=k8s.io images import -'
+        sh 'docker exec minikube ctr --namespace=k8s.io images unpack --snapshotter overlayfs docker.io/library/sdet-test:latest'
+    }
+}
         stage('Deploy to Kubernetes') {
             steps {
                 sh 'docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf delete job sdet-test-job --ignore-not-found=true'
