@@ -23,6 +23,7 @@ options.addArguments("--headless=new");
 
 // 2. Disable sandbox security (Mandatory because Docker runs as root)
 options.addArguments("--no-sandbox"); 
+options.addArguments("--disable-gpu");
 
 // 3. Prevent Chrome from crashing due to Docker's limited /dev/shm memory
 options.addArguments("--disable-dev-shm-usage"); 

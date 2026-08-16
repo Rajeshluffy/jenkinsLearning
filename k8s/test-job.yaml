@@ -12,10 +12,15 @@ spec:
         volumeMounts:
         - name: test-reports
           mountPath: /app/target/surefire-reports
+        - name: dshm
+          mountPath: /dev/shm
       restartPolicy: Never
       volumes:
       - name: test-reports
         hostPath:
           path: /tmp/surefire-reports
           type: DirectoryOrCreate
+      - name: dshm
+        emptyDir:
+          medium: Memory
   backoffLimit: 0
