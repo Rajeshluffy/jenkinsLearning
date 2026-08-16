@@ -9,14 +9,15 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build --platform linux/amd64 --provenance=false -t sdet-test:latest .'
+                // Dynamically tag the image with the Jenkins build number to avoid K8s caching
+                sh 'docker build --platform linux/amd64 --provenance=false -t sdet-test:${BUILD_ID} .'
             }
         }
         stage('Load Image into Minikube') {
             steps {
                sh '''
-                    # 1. Save the image to a tar file locally in the Jenkins workspace
-                    docker save -o sdet-test.tar sdet-test:latest
+                    # 1. Save the image to a tar file using the unique Build ID
+                    docker save -o sdet-test.tar sdet-test:${BUILD_ID}
                     
                     # 2. Copy the tar file directly to the root directory (/) of Minikube
                     docker cp sdet-test.tar minikube:/sdet-test.tar
@@ -24,7 +25,7 @@ pipeline {
                     # 3. Verify the file actually exists inside Minikube and check its size
                     docker exec minikube ls -lh /sdet-test.tar
                     
-                    # 4. Import the image into Kubernetes' containerd registry
+                    # 4. Import the unique image into Kubernetes' containerd registry
                     docker exec minikube ctr --namespace=k8s.io images import /sdet-test.tar
                     
                     # 5. Clean up the large tar files so they don't eat up disk space
@@ -35,8 +36,16 @@ pipeline {
         }
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf delete job sdet-test-job --ignore-not-found=true'
-                sh 'cat k8s/test-job.yaml | docker exec -i minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f -'
+                sh '''
+                    # 1. Delete the old job
+                    docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf delete job sdet-test-job --ignore-not-found=true
+                    
+                    # 2. MAGICAL FIX: Search and replace "latest" with the actual Build ID in the YAML file
+                    sed -i "s/sdet-test:latest/sdet-test:${BUILD_ID}/g" k8s/test-job.yaml
+                    
+                    # 3. Apply the newly modified YAML file to Kubernetes
+                    cat k8s/test-job.yaml | docker exec -i minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f -
+                '''
             }
         }
         stage('Collect Test Results') {
