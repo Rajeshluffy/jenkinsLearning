@@ -14,7 +14,20 @@ pipeline {
         }
         stage('Load Image into Minikube') {
             steps {
-               sh 'docker save sdet-test:latest | docker exec -i minikube docker load'
+               sh '''
+                    # 1. Save the image to a tar file
+                    docker save -o sdet-test.tar sdet-test:latest
+                    
+                    # 2. Copy the tar file into the minikube container
+                    docker cp sdet-test.tar minikube:/tmp/sdet-test.tar
+                    
+                    # 3. Import the image directly from the file
+                    docker exec minikube ctr --namespace=k8s.io images import /tmp/sdet-test.tar
+                    
+                    # Optional: Clean up the tar file to save space
+                    rm sdet-test.tar
+                    docker exec minikube rm /tmp/sdet-test.tar
+                '''
             }
         }
         stage('Deploy to Kubernetes') {
