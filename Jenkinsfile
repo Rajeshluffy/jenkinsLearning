@@ -22,13 +22,10 @@ pipeline {
                     # 2. Copy the tar file directly to the root directory (/) of Minikube
                     docker cp sdet-test.tar minikube:/sdet-test.tar
                     
-                    # 3. Verify the file actually exists inside Minikube and check its size
-                    docker exec minikube ls -lh /sdet-test.tar
+                    # 3. Load the image into Minikube's internal Docker daemon (Fix for ErrImageNeverPull)
+                    docker exec minikube docker load -i /sdet-test.tar
                     
-                    # 4. Import the unique image into Kubernetes' containerd registry
-                    docker exec minikube ctr --namespace=k8s.io images import /sdet-test.tar
-                    
-                    # 5. Clean up the large tar files so they don't eat up disk space
+                    # 4. Clean up the large tar files so they don't eat up disk space
                     rm sdet-test.tar
                     docker exec minikube rm /sdet-test.tar
                 '''
