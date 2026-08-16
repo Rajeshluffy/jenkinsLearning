@@ -15,18 +15,21 @@ pipeline {
         stage('Load Image into Minikube') {
             steps {
                sh '''
-                    # 1. Save the image to a tar file
+                    # 1. Save the image to a tar file locally in the Jenkins workspace
                     docker save -o sdet-test.tar sdet-test:latest
                     
-                    # 2. Copy the tar file into the minikube container
-                    docker cp sdet-test.tar minikube:/tmp/sdet-test.tar
+                    # 2. Copy the tar file directly to the root directory (/) of Minikube
+                    docker cp sdet-test.tar minikube:/sdet-test.tar
                     
-                    # 3. Import the image directly from the file
-                    docker exec minikube ctr --namespace=k8s.io images import /tmp/sdet-test.tar
+                    # 3. Verify the file actually exists inside Minikube and check its size
+                    docker exec minikube ls -lh /sdet-test.tar
                     
-                    # Optional: Clean up the tar file to save space
+                    # 4. Import the image into Kubernetes' containerd registry
+                    docker exec minikube ctr --namespace=k8s.io images import /sdet-test.tar
+                    
+                    # 5. Clean up the large tar files so they don't eat up disk space
                     rm sdet-test.tar
-                    docker exec minikube rm /tmp/sdet-test.tar
+                    docker exec minikube rm /sdet-test.tar
                 '''
             }
         }
