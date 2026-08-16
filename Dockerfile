@@ -13,4 +13,4 @@ COPY pom.xml .
 RUN mvn dependency:go-offline -B
 COPY src ./src
 COPY testng.xml .
-CMD ["mvn", "clean", "test", "-B"]
+CMD ["mvn", "test", "-B"]
