@@ -27,9 +27,14 @@ pipeline {
             steps {
                 sh '''
                     KUBECTL="docker exec minikube /var/lib/minikube/binaries/v1.35.1/kubectl --kubeconfig=/etc/kubernetes/admin.conf"
-                    $KUBECTL wait --for=condition=complete job/sdet-test-job --timeout=300s || true
+                    
+                    # Wait up to 5 minutes for the job to complete. If it fails or times out, Jenkins will fail here.
+                    $KUBECTL wait --for=condition=complete job/sdet-test-job --timeout=300s
+                    
                     mkdir -p target
-                    docker cp minikube:/tmp/surefire-reports ./target/surefire-reports || true
+                    
+                    # Copy the reports. If the reports don't exist, Jenkins will fail here.
+                    docker cp minikube:/tmp/surefire-reports ./target/surefire-reports
                 '''
             }
         }

@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: sdet-test
-        image: docker.io/library/sdet-test:latest
+        image: sdet-test:latest
         imagePullPolicy: Never
         volumeMounts:
         - name: test-reports
