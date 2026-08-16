@@ -55,8 +55,8 @@ pipeline {
                     
                     mkdir -p target
                     
-                    # Copy the reports. If the reports don't exist, Jenkins will fail here.
-                    docker cp minikube:/tmp/surefire-reports ./target/surefire-reports
+                    # Copy the reports from the persistent /data folder instead of /tmp
+                    docker cp minikube:/data/surefire-reports ./target/surefire-reports
                 '''
             }
         }

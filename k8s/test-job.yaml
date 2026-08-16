@@ -16,6 +16,6 @@ spec:
       volumes:
       - name: test-reports
         hostPath:
-          path: /tmp/surefire-reports
+          path: /data/surefire-reports
           type: DirectoryOrCreate
   backoffLimit: 0
